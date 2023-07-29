@@ -22,7 +22,7 @@ def get_systeminfo():
 	except Exception as e:
 		return str(e), 500
 
-@app.route('/update', methods=['POST'])
+@app.route('/update', methods=['GET'])
 def update_application():
 	try:
 		# Run the automate-update.sh script
@@ -34,7 +34,7 @@ def update_application():
 	except Exception as e:
 		return str(e), 500
 
-@app.route('/reboot', methods=['POST'])
+@app.route('/reboot', methods=['GET'])
 def reboot_raspberry_pi():
 	try:
 		# Run the command to reboot the Raspberry Pi
