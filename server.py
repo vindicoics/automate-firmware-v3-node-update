@@ -26,11 +26,11 @@ def get_systeminfo():
 def update_application():
 	try:
 		# Run the automate-update.sh script
-		result = subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
-		if result.returncode == 0:
-			return "Automate Update Task Set"
-		else:
-			return "Error updating application: " + result.stderr, 500
+		subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
+		# if result.returncode == 0:
+		return "Automate Update Task Set"
+		# else:
+		# 	return "Error updating application: " + result.stderr, 500
 	except Exception as e:
 		return str(e), 500
 
