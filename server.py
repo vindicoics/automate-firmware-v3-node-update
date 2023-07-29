@@ -28,7 +28,7 @@ def update_application():
 		# Run the automate-update.sh script
 		subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
 		# if result.returncode == 0:
-		return "Automate Update Task Set"
+		return jsonify(success=True, data="Automate Update Task Set")
 		# else:
 		# 	return "Error updating application: " + result.stderr, 500
 	except Exception as e:
@@ -39,7 +39,7 @@ def reboot_raspberry_pi():
 	try:
 		# Run the command to reboot the Raspberry Pi
 		subprocess.run(['sudo', 'reboot'])
-		return "Raspberry Pi is rebooting..."
+		return jsonify(success=True, data="Raspberry Pi is rebooting...")
 	except Exception as e:
 		return str(e), 500
 
