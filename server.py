@@ -8,20 +8,6 @@ app = Flask(__name__)
 def check_status():
 	return jsonify(success=True, data="Update Server is Running")
 
-@app.route('/systeminfo', methods=['GET'])
-def get_systeminfo():
-	try:
-		# Run the system-info script
-		result = subprocess.run(['python3', 'system-info.py'], capture_output=True, text=True)
-		if result.returncode == 0:
-			data = json.loads(result.stdout)
-			return jsonify(data)
-		else:
-			return "Error updating application: " + result.stderr, 500
-	
-	except Exception as e:
-		return str(e), 500
-
 @app.route('/update', methods=['GET'])
 def update_application():
 	try:
