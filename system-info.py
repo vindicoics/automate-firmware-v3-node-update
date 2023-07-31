@@ -2,6 +2,7 @@ import psutil
 import json
 import netifaces as ni
 import requests
+import time
 
 def get_memory_usage():
     memory = psutil.virtual_memory()
@@ -70,39 +71,38 @@ def post_system_info(system_info):
     return response
 
 def main():
-    memory_usage = get_memory_usage()
-    disk_usage = get_disk_usage()
-    cpu_usage = get_cpu_usage()
-    network_info = get_network_info()
-    serial_number = get_serial_number()
-    system_info = {
-        "serial_number": serial_number,
-        "total_memory": memory_usage["total_memory"],
-        "available_memory": memory_usage["available_memory"],
-        "used_memory": memory_usage["used_memory"],
-        "free_memory": memory_usage["free_memory"],
-        "memory_percent": memory_usage["memory_percent"],
-        "memory_unit": memory_usage["memory_unit"],
-        "total_disk": disk_usage["total_disk"],
-        "used_disk": disk_usage["used_disk"],
-        "free_disk": disk_usage["free_disk"],
-        "disk_percent": disk_usage["disk_percent"],
-        "disk_unit": disk_usage["disk_unit"],
-        "cpu_percent": cpu_usage["cpu_percent"],
-        "cpu_unit": cpu_usage["cpu_unit"],
-        "ip_address": network_info["ip_address"],
-        "mac_address": network_info["mac_address"]
-    }
-    json_output = json.dumps(system_info, indent=4)
-    
-    response = post_system_info(system_info)
-    print(json_output)
-
-    # Output the response content
-    if response:
-        print("Response Content:")
-        print(response.json())
+    while True:
+        memory_usage = get_memory_usage()
+        disk_usage = get_disk_usage()
+        cpu_usage = get_cpu_usage()
+        network_info = get_network_info()
+        serial_number = get_serial_number()
+        system_info = {
+            "serial_number": serial_number,
+            "total_memory": memory_usage["total_memory"],
+            "available_memory": memory_usage["available_memory"],
+            "used_memory": memory_usage["used_memory"],
+            "free_memory": memory_usage["free_memory"],
+            "memory_percent": memory_usage["memory_percent"],
+            "memory_unit": memory_usage["memory_unit"],
+            "total_disk": disk_usage["total_disk"],
+            "used_disk": disk_usage["used_disk"],
+            "free_disk": disk_usage["free_disk"],
+            "disk_percent": disk_usage["disk_percent"],
+            "disk_unit": disk_usage["disk_unit"],
+            "cpu_percent": cpu_usage["cpu_percent"],
+            "cpu_unit": cpu_usage["cpu_unit"],
+            "ip_address": network_info["ip_address"],
+            "mac_address": network_info["mac_address"]
+        }
+        json_output = json.dumps(system_info, indent=4)
+        response = post_system_info(system_info)
+        print(json_output)
+        # Output the response content
+        if response:
+            print("Response Content:")
+            print(response.json())
+        time.sleep(10)
     	
-
 if __name__ == "__main__":
     main()
