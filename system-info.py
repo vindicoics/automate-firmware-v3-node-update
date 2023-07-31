@@ -97,11 +97,11 @@ def main():
         }
         json_output = json.dumps(system_info, indent=4)
         response = post_system_info(system_info)
-        print(json_output)
+        # print(json_output)
         # Output the response content
-        if response:
-            print("Response Content:")
-            print(response.json())
+        # if response:
+            # print("Response Content:")
+            # print(response.json())
         time.sleep(10)
     	
 if __name__ == "__main__":
