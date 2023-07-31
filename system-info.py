@@ -61,7 +61,7 @@ def post_system_info(system_info):
     url = "http://localhost:8085/api/v1/systeminfo"
     headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(url, data=json.dumps(system_info), headers=headers)
+    response = requests.post(url, json.dumps(system_info), headers=headers)
     if response.status_code == 200:
         print("System info posted successfully.")
     else:
