@@ -66,6 +66,8 @@ def post_system_info(system_info):
         print("System info posted successfully.")
     else:
         print(f"Failed to post system info. Status code: {response.status_code}")
+        
+    return response
 
 def main():
     memory_usage = get_memory_usage()
@@ -92,8 +94,15 @@ def main():
         "mac_address": network_info["mac_address"]
     }
     json_output = json.dumps(system_info, indent=4)
-    post_system_info(system_info)
+    
+    response = post_system_info(system_info)
     print(json_output)
+
+    # Output the response content
+    if response:
+        print("Response Content:")
+        print(response.json())
+    	
 
 if __name__ == "__main__":
     main()
