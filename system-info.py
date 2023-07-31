@@ -63,11 +63,10 @@ def post_system_info(system_info):
     headers = {'Content-Type': 'application/json'}
 
     response = requests.post(url, json.dumps(system_info), headers=headers)
-    if response.status_code == 200:
-        print("System info posted successfully.")
-    else:
+    if response.status_code != 200:
         print(f"Failed to post system info. Status code: {response.status_code}")
         
+        # print("System info posted successfully.")
     return response
 
 def main():
