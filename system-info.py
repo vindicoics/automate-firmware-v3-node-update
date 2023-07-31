@@ -92,7 +92,8 @@ def main():
             "cpu_percent": cpu_usage["cpu_percent"],
             "cpu_unit": cpu_usage["cpu_unit"],
             "ip_address": network_info["ip_address"],
-            "mac_address": network_info["mac_address"]
+            "mac_address": network_info["mac_address"],
+            "timestamp": int(time.time())
         }
         json_output = json.dumps(system_info, indent=4)
         response = post_system_info(system_info)
