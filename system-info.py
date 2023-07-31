@@ -1,6 +1,7 @@
 import psutil
 import json
 import netifaces as ni
+import requests
 
 def get_memory_usage():
     memory = psutil.virtual_memory()
@@ -56,6 +57,16 @@ def get_serial_number():
 
     return "N/A"
 
+def post_system_info(system_info):
+    url = "http://localhost:8085/api/v1/systeminfo"
+    headers = {'Content-Type': 'application/json'}
+
+    response = requests.post(url, data=json.dumps(system_info), headers=headers)
+    if response.status_code == 200:
+        print("System info posted successfully.")
+    else:
+        print(f"Failed to post system info. Status code: {response.status_code}")
+
 def main():
     memory_usage = get_memory_usage()
     disk_usage = get_disk_usage()
@@ -81,6 +92,7 @@ def main():
         "mac_address": network_info["mac_address"]
     }
     json_output = json.dumps(system_info, indent=4)
+    post_system_info(system_info)
     print(json_output)
 
 if __name__ == "__main__":
