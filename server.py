@@ -105,8 +105,8 @@ def system_info():
             "mac_address": network_info["mac_address"],
             "timestamp": int(time.time() * 1000)
         }
-        json_output = json.dumps(system_info, indent=4)
-        return jsonify(success=True, data=json_output)
+        # json_output = json.dumps(system_info, indent=4)
+        return jsonify(success=True, data=system_info)
     except Exception as e:
         return str(e), 500
 
