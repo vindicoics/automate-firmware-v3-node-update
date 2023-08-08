@@ -5,6 +5,7 @@ import psutil
 import netifaces as ni
 import requests
 import time
+import threading
 
 app = Flask(__name__)
 
@@ -110,14 +111,21 @@ def system_info():
     except Exception as e:
         return str(e), 500
 
+def reboot_server():
+    # Add a delay to allow the server to respond first
+    time.sleep(10)
+    # Execute the reboot command
+    subprocess.run(['sudo', 'reboot'])
+
 @app.route('/reboot', methods=['GET'])
 def reboot_raspberry_pi():
-	try:
-		# Run the command to reboot the Raspberry Pi
-		subprocess.run(['sudo', 'reboot'])
-		return jsonify(success=True, data="Raspberry Pi is rebooting...")
-	except Exception as e:
-		return str(e), 500
+    try:
+	    # Start a new thread for the reboot process
+        reboot_thread = threading.Thread(target=reboot_server)
+        reboot_thread.start()
+        return jsonify(success=True, data="Raspberry Pi is rebooting...")
+    except Exception as e:
+         return str(e), 500
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=8086)
