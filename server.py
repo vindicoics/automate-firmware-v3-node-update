@@ -8,7 +8,7 @@ import time
 import threading
 import csv
 
-version = "1.0.0"
+version = "1.0.1"
 
 app = Flask(__name__)
 
@@ -107,7 +107,7 @@ def get_serial_number():
 ## CHECK STATUS
 @app.route('/status', methods=['GET'])
 def check_status():
-	return jsonify(success=True, data="Update Server is Running Version " + version)
+	return jsonify(success=True, message="Update Server is Running Version " + version)
 
 ## UPDATE SERVER SOFTWARE
 @app.route('/update_server', methods=['GET'])
@@ -137,7 +137,7 @@ def update_server_application():
     try:
         update_thread = threading.Thread(target=update_server)
         update_thread.start()
-        return jsonify(success=True, data="Update Server Restart Task Set")
+        return jsonify(success=True, message="Update Server Restart Task Set")
     except Exception as e:
         return str(e), 500		
 
