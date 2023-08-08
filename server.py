@@ -67,17 +67,81 @@ def get_serial_number():
 def check_status():
 	return jsonify(success=True, data="Update Server is Running")
 
+def update_automate():
+    # Add a delay to allow the server to respond first
+    time.sleep(10)
+    # Execute the reboot command
+    subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
+
 @app.route('/update', methods=['GET'])
 def update_application():
-	try:
+    try:
 		# Run the automate-update.sh script
-		subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
+        update_thread = threading.Thread(target=update_automate)
+        update_thread.start()
 		# if result.returncode == 0:
-		return jsonify(success=True, data="Automate Update Task Set")
+        return jsonify(success=True, data="Automate Update Task Set")
 		# else:
 		# 	return "Error updating application: " + result.stderr, 500
-	except Exception as e:
-		return str(e), 500
+    except Exception as e:
+        return str(e), 500
+    
+def stop_automate():
+    # Add a delay to allow the server to respond first
+    time.sleep(10)
+    # Execute the reboot command
+    subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=True, text=True)
+
+@app.route('/stop', methods=['GET'])
+def stop_application():
+    try:
+		# Run the automate-update.sh script
+        stop_thread = threading.Thread(target=stop_automate)
+        stop_thread.start()
+		# if result.returncode == 0:
+        return jsonify(success=True, data="Automate Stop Task Set")
+		# else:
+		# 	return "Error updating application: " + result.stderr, 500
+    except Exception as e:
+        return str(e), 500	
+        
+def start_automate():
+    # Add a delay to allow the server to respond first
+    time.sleep(10)
+    # Execute the reboot command
+    subprocess.run(['sh', '/home/pi/automate-node/automate-start.sh'], capture_output=True, text=True)
+
+@app.route('/start', methods=['GET'])
+def start_application():
+    try:
+		# Run the automate-update.sh script
+        start_thread = threading.Thread(target=start_automate)
+        start_thread.start()
+		# if result.returncode == 0:
+        return jsonify(success=True, data="Automate Start Task Set")
+		# else:
+		# 	return "Error updating application: " + result.stderr, 500
+    except Exception as e:
+        return str(e), 500	
+        
+def restart_automate():
+    # Add a delay to allow the server to respond first
+    time.sleep(10)
+    # Execute the reboot command
+    subprocess.run(['sh', '/home/pi/automate-node/automate-restart.sh'], capture_output=True, text=True)
+
+@app.route('/restart', methods=['GET'])
+def restart_application():
+    try:
+		# Run the automate-update.sh script
+        restart_thread = threading.Thread(target=restart_automate)
+        restart_thread.restart()
+		# if result.returncode == 0:
+        return jsonify(success=True, data="Automate Restart Task Set")
+		# else:
+		# 	return "Error updating application: " + result.stderr, 500
+    except Exception as e:
+        return str(e), 500			
         
 @app.route('/systeminfo', methods=['GET'])
 def system_info():
