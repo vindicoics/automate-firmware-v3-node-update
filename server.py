@@ -98,7 +98,7 @@ def stop_application():
 		# Run the automate-update.sh script
         # stop_thread = threading.Thread(target=stop_automate)
         # stop_thread.start()
-        result = subprocess.Popen(['sudo', 'docker-compose', '/home/pi/automate-node/docker-compose.yaml', 'stop'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         # Wait for the process to complete
         stdout, stderr = result.communicate()
         print(stdout)
