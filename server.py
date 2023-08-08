@@ -136,7 +136,7 @@ def update_application():
 @app.route('/stop', methods=['GET'])
 def stop_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, text=True)
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         output = result.communicate()
         print(output)
         write_log(output)
