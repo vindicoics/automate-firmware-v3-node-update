@@ -8,6 +8,8 @@ import time
 import threading
 import csv
 
+version = "1.0.0"
+
 app = Flask(__name__)
 
 ## WRITE TO LOG FILE
@@ -105,7 +107,7 @@ def get_serial_number():
 ## CHECK STATUS
 @app.route('/status', methods=['GET'])
 def check_status():
-	return jsonify(success=True, data="Update Server is Running")
+	return jsonify(success=True, data="Update Server is Running Version " + version)
 
 ## UPDATE SERVER SOFTWARE
 @app.route('/update_server', methods=['GET'])
@@ -215,6 +217,7 @@ def system_info():
         network_info = get_network_info()
         serial_number = get_serial_number()
         system_info = {
+            "updateserver_version": version,
             "serial_number": serial_number,
             "total_memory": memory_usage["total_memory"],
             "available_memory": memory_usage["available_memory"],
