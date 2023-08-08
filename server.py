@@ -3,12 +3,47 @@ import json
 import subprocess
 import psutil
 import netifaces as ni
-import requests
+# import requests
 import time
 import threading
+import csv
 
 app = Flask(__name__)
 
+## WRITE TO LOG FILE
+def write_log(stdout, stderr):
+    try:
+        with open('/home/pi/automate-update/log.csv', 'w', newline='') as file:
+            csv_writer = csv.writer(file)
+            csv_writer.writerow([int(time.time() * 1000), stdout, stderr])
+            
+        print("Data written to", file_path)
+    
+    except Exception as e:
+        print("Error:", e)
+        
+## READ LOG FILE
+def read_log():
+    data = []
+    try:
+        with open('/home/pi/automate-update/log.csv', 'r') as file:
+            csv_reader = csv.reader(file)
+            headers = next(csv_reader)  # Read and ignore the header row
+            for row in csv_reader:
+                data.append(row)
+            
+    except Exception as e:
+        print("Error:", e)
+    
+    return data		
+
+## GET LOG FILE
+@app.route('/log', methods=['GET'])
+def get_log():
+    data = read_log()
+    return jsonify(data)
+
+## GET MEMORY USAGE
 def get_memory_usage():
     memory = psutil.virtual_memory()
     return {
@@ -20,6 +55,7 @@ def get_memory_usage():
         "memory_unit": "bytes"
     }
 
+## GET DISK USAGE
 def get_disk_usage():
     disk = psutil.disk_usage('/')
     return {
@@ -30,12 +66,14 @@ def get_disk_usage():
         "disk_unit": "bytes"
     }
 
+## GET CPU USAGE
 def get_cpu_usage():
     return {
         "cpu_percent": psutil.cpu_percent(interval=1),
         "cpu_unit": "percent"
     }
 
+## GET NETWORK INFO
 def get_network_info():
     # Get the IP and MAC addresses of the Ethernet interface (assumes eth0)
     try:
@@ -51,6 +89,7 @@ def get_network_info():
         "mac_address": mac_address
     }
 
+## GET SERIAL NUMBER
 def get_serial_number():
     try:
         with open('/proc/cpuinfo', 'r') as f:
@@ -63,15 +102,27 @@ def get_serial_number():
 
     return "N/A"
 
+## CHECK STATUS
 @app.route('/status', methods=['GET'])
 def check_status():
 	return jsonify(success=True, data="Update Server is Running")
 
+## UPDATE AUTOMATE SOFTWARE
 def update_automate():
     # Add a delay to allow the server to respond first
     time.sleep(5)
-    # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=False)
+    # Pull the latest version of the application
+    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    stdout, stderr = result.communicate()
+    print(stdout)
+    print(stderr)
+    write_log(stdout, stderr)
+    # Remove old images to save space
+    result2 = subprocess.Popen(['sudo', 'docker', 'images', 'prune'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    stdout, stderr = result2.communicate()
+    print(stdout)
+    print(stderr)
+    write_log(stdout, stderr)
 
 @app.route('/update', methods=['GET'])
 def update_application():
@@ -79,75 +130,50 @@ def update_application():
 		# Run the automate-update.sh script
         update_thread = threading.Thread(target=update_automate)
         update_thread.start()
-		# if result.returncode == 0:
         return jsonify(success=True, data="Automate Update Task Set")
-		# else:
-		# 	return "Error updating application: " + result.stderr, 500
     except Exception as e:
         return str(e), 500
     
-def stop_automate():
-    # Add a delay to allow the server to respond first
-    time.sleep(5)
-    # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=False)
-
+## STOP AUTOMATE SOFTWARE
 @app.route('/stop', methods=['GET'])
 def stop_application():
     try:
-		# Run the automate-update.sh script
-        # stop_thread = threading.Thread(target=stop_automate)
-        # stop_thread.start()
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        # Wait for the process to complete
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         print(stdout)
         print(stderr)
-		# if result.returncode == 0:
+        write_log(stdout, stderr)
         return jsonify(success=True, data="Automate Stop Task Set", result=stdout, error=stderr)
-		# else:
-		# 	return "Error updating application: " + result.stderr, 500
     except Exception as e:
         return str(e), 500	
         
-def start_automate():
-    # Add a delay to allow the server to respond first
-    time.sleep(5)
-    # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-start.sh'], capture_output=False)
-
+## START AUTOMATE SOFTWARE
 @app.route('/start', methods=['GET'])
 def start_application():
     try:
-		# Run the automate-update.sh script
-        start_thread = threading.Thread(target=start_automate)
-        start_thread.start()
-		# if result.returncode == 0:
-        return jsonify(success=True, data="Automate Start Task Set")
-		# else:
-		# 	return "Error updating application: " + result.stderr, 500
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        print(stdout)
+        print(stderr)
+        write_log(stdout, stderr)      
+        return jsonify(success=True, data="Automate Start Task Set", result=stdout, error=stderr)
     except Exception as e:
         return str(e), 500	
         
-def restart_automate():
-    # Add a delay to allow the server to respond first
-    time.sleep(5)
-    # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-restart.sh'], capture_output=False)
-
+## RESTART AUTOMATE SOFTWARE
 @app.route('/restart', methods=['GET'])
 def restart_application():
     try:
-		# Run the automate-update.sh script
-        restart_thread = threading.Thread(target=restart_automate)
-        restart_thread.restart()
-		# if result.returncode == 0:
-        return jsonify(success=True, data="Automate Restart Task Set")
-		# else:
-		# 	return "Error updating application: " + result.stderr, 500
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        print(stdout)
+        print(stderr)
+        write_log(stdout, stderr)
+        return jsonify(success=True, data="Automate Restart Task Set", result=stdout, error=stderr)
     except Exception as e:
         return str(e), 500			
         
+## GET SYSTEM INFO
 @app.route('/systeminfo', methods=['GET'])
 def system_info():
     try:
@@ -175,11 +201,11 @@ def system_info():
             "mac_address": network_info["mac_address"],
             "timestamp": int(time.time() * 1000)
         }
-        # json_output = json.dumps(system_info, indent=4)
         return jsonify(success=True, data=system_info)
     except Exception as e:
         return str(e), 500
 
+## REBOOT RASPBERRY PI
 def reboot_server():
     # Add a delay to allow the server to respond first
     time.sleep(10)
@@ -196,6 +222,7 @@ def reboot_raspberry_pi():
     except Exception as e:
          return str(e), 500
 
+## RUN UPDATE SERVER APPLICATION
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=8086)
 
