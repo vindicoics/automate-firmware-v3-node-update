@@ -13,10 +13,10 @@ app = Flask(__name__)
 ## WRITE TO LOG FILE
 def write_log(stdout, stderr):
     try:
-        with open('/home/pi/automate-update/log.csv', 'w', newline='') as file:
+        with open('/home/pi/automate-update/log.csv', 'a', newline='') as file:
             csv_writer = csv.writer(file)
             csv_writer.writerow([int(time.time() * 1000), stdout, stderr])
-            
+
         print("Data written to", file_path)
     
     except Exception as e:
