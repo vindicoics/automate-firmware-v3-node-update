@@ -96,10 +96,11 @@ def stop_automate():
 def stop_application():
     try:
 		# Run the automate-update.sh script
-        stop_thread = threading.Thread(target=stop_automate)
-        stop_thread.start()
+        # stop_thread = threading.Thread(target=stop_automate)
+        # stop_thread.start()
+        result = subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=True, text=True)
 		# if result.returncode == 0:
-        return jsonify(success=True, data="Automate Stop Task Set")
+        return jsonify(success=True, data="Automate Stop Task Set", result=result.stdout)
 		# else:
 		# 	return "Error updating application: " + result.stderr, 500
     except Exception as e:
