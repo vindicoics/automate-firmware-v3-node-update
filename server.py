@@ -98,10 +98,13 @@ def stop_application():
 		# Run the automate-update.sh script
         # stop_thread = threading.Thread(target=stop_automate)
         # stop_thread.start()
-        result = subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        print(result.stdout)
+        result = subprocess.Popen(['sh', '/home/pi/automate-node/automate-stop.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Wait for the process to complete
+        stdout, stderr = result.communicate()
+        print(stdout)
+        print(stderr)
 		# if result.returncode == 0:
-        return jsonify(success=True, data="Automate Stop Task Set", result=result.stdout)
+        return jsonify(success=True, data="Automate Stop Task Set", result=stdout, error=stderr)
 		# else:
 		# 	return "Error updating application: " + result.stderr, 500
     except Exception as e:
