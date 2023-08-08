@@ -111,7 +111,7 @@ def check_status():
 @app.route('/update_server', methods=['GET'])
 def update_server():
     try:
-        result = subprocess.Popen(['sudo', 'git', 'pull', '--no-rebase'], cwd='/home/pi/automate_update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.Popen(['sudo', 'git', 'pull', '--no-rebase'], cwd='/home/pi/automate-update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
@@ -123,7 +123,7 @@ def update_server():
 def update_server():
     # Add a delay to allow the server to respond first
     time.sleep(5)
-    result = subprocess.Popen(['sudo', 'systemctl', 'restart', 'update_server'], cwd='/home/pi/automate_update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.Popen(['sudo', 'systemctl', 'restart', 'update_server'], cwd='/home/pi/automate-update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     stdout, stderr = result.communicate()
     output = stdout + '\n' + stderr
     print(output)
