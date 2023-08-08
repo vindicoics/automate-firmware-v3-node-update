@@ -112,13 +112,15 @@ def update_automate():
     # Add a delay to allow the server to respond first
     time.sleep(5)
     # Pull the latest version of the application
-    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    output = result.communicate()
+    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    stdout, stderr = result.communicate()
+    output = stdout + '\n' + stderr
     print(output)
     write_log(output)
     # Remove old images to save space
-    result2 = subprocess.Popen(['sudo', 'docker', 'images', 'prune'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    output = result2.communicate()
+    result2 = subprocess.Popen(['sudo', 'docker', 'images', 'prune'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    stdout, stderr = result2.communicate()
+    output = stdout + '\n' + stderr
     print(output)
     write_log(output)
 
@@ -136,8 +138,9 @@ def update_application():
 @app.route('/stop', methods=['GET'])
 def stop_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        output = result.communicate()
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        output = stdout + '\n' + stderr
         print(output)
         write_log(output)
         return jsonify(success=True, message="Automate Stop Task Set", data=output)
@@ -148,8 +151,9 @@ def stop_application():
 @app.route('/start', methods=['GET'])
 def start_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        output = result.communicate()
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        output = stdout + '\n' + stderr
         print(output)
         write_log(output)    
         return jsonify(success=True, message="Automate Start Task Set", data=output)
@@ -160,8 +164,9 @@ def start_application():
 @app.route('/restart', methods=['GET'])
 def restart_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        output = result.communicate()
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        output = stdout + '\n' + stderr
         print(output)
         write_log(output)
         return jsonify(success=True, message="Automate Restart Task Set", data=output)
