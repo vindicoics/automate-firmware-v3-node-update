@@ -45,6 +45,21 @@ def get_log():
     data = read_log()
     return jsonify(data)
 
+## CLEAR LOG FILE
+@app.route('/clear_log', methods=['GET'])
+def clear_log():
+    try:
+        result = subprocess.Popen(['rm', '-f', '/home/pi/automate-update/log.csv'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        output = stdout + '\n' + stderr
+        print(output)
+        write_log(output)
+        return jsonify(success=True, message="Clear Log Task Set ", data=output)
+    except Exception as e:
+        return str(e), 500	
+
+
+
 ## GET MEMORY USAGE
 def get_memory_usage():
     memory = psutil.virtual_memory()
