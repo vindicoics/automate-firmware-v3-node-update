@@ -107,6 +107,38 @@ def get_serial_number():
 def check_status():
 	return jsonify(success=True, data="Update Server is Running")
 
+## UPDATE SERVER SOFTWARE
+@app.route('/update_server', methods=['GET'])
+def update_server():
+    try:
+        result = subprocess.Popen(['sudo', 'git', 'pull', '--no-rebase'], cwd='/home/pi/automate_update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = result.communicate()
+        output = stdout + '\n' + stderr
+        print(output)
+        write_log(output)
+        return jsonify(success=True, message="Update Server - Update Task Set ", data=output)
+    except Exception as e:
+        return str(e), 500	
+
+def update_server():
+    # Add a delay to allow the server to respond first
+    time.sleep(5)
+    result = subprocess.Popen(['sudo', 'systemctl', 'restart', 'update_server'], cwd='/home/pi/automate_update', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    stdout, stderr = result.communicate()
+    output = stdout + '\n' + stderr
+    print(output)
+    write_log(output)
+
+## RESTART UPDATE SERVER SOFTWARE
+@app.route('/restart_server', methods=['GET'])
+def update_server_application():
+    try:
+        update_thread = threading.Thread(target=update_server)
+        update_thread.start()
+        return jsonify(success=True, data="Update Server Restart Task Set")
+    except Exception as e:
+        return str(e), 500		
+
 ## UPDATE AUTOMATE SOFTWARE
 def update_automate():
     # Add a delay to allow the server to respond first
@@ -124,7 +156,7 @@ def update_automate():
     print(output)
     write_log(output)
 
-@app.route('/update', methods=['GET'])
+@app.route('/update_automate', methods=['GET'])
 def update_application():
     try:
 		# Run the automate-update.sh script
@@ -135,7 +167,7 @@ def update_application():
         return str(e), 500
     
 ## STOP AUTOMATE SOFTWARE
-@app.route('/stop', methods=['GET'])
+@app.route('/stop_automate', methods=['GET'])
 def stop_application():
     try:
         result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -148,7 +180,7 @@ def stop_application():
         return str(e), 500	
         
 ## START AUTOMATE SOFTWARE
-@app.route('/start', methods=['GET'])
+@app.route('/start_automate', methods=['GET'])
 def start_application():
     try:
         result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -161,7 +193,7 @@ def start_application():
         return str(e), 500	
         
 ## RESTART AUTOMATE SOFTWARE
-@app.route('/restart', methods=['GET'])
+@app.route('/restart_automate', methods=['GET'])
 def restart_application():
     try:
         result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
