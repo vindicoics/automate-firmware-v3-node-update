@@ -11,11 +11,11 @@ import csv
 app = Flask(__name__)
 
 ## WRITE TO LOG FILE
-def write_log(stdout, stderr):
+def write_log(output):
     try:
         with open('/home/pi/automate-update/log.csv', 'a', newline='') as file:
             csv_writer = csv.writer(file)
-            csv_writer.writerow([int(time.time() * 1000), stdout, stderr])
+            csv_writer.writerow([int(time.time() * 1000), output])
 
         print("Data written to", file_path)
     
@@ -112,17 +112,15 @@ def update_automate():
     # Add a delay to allow the server to respond first
     time.sleep(5)
     # Pull the latest version of the application
-    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    stdout, stderr = result.communicate()
-    print(stdout)
-    print(stderr)
-    write_log(stdout, stderr)
+    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+    output = result.communicate()
+    print(output)
+    write_log(output)
     # Remove old images to save space
-    result2 = subprocess.Popen(['sudo', 'docker', 'images', 'prune'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    stdout, stderr = result2.communicate()
-    print(stdout)
-    print(stderr)
-    write_log(stdout, stderr)
+    result2 = subprocess.Popen(['sudo', 'docker', 'images', 'prune'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+    output = result2.communicate()
+    print(output)
+    write_log(output)
 
 @app.route('/update', methods=['GET'])
 def update_application():
@@ -138,12 +136,11 @@ def update_application():
 @app.route('/stop', methods=['GET'])
 def stop_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = result.communicate()
-        print(stdout)
-        print(stderr)
-        write_log(stdout, stderr)
-        return jsonify(success=True, data="Automate Stop Task Set", result=stdout, error=stderr)
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+        output = result.communicate()
+        print(output)
+        write_log(output)
+        return jsonify(success=True, message="Automate Stop Task Set", data=output)
     except Exception as e:
         return str(e), 500	
         
@@ -151,12 +148,11 @@ def stop_application():
 @app.route('/start', methods=['GET'])
 def start_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = result.communicate()
-        print(stdout)
-        print(stderr)
-        write_log(stdout, stderr)      
-        return jsonify(success=True, data="Automate Start Task Set", result=stdout, error=stderr)
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+        output = result.communicate()
+        print(output)
+        write_log(output)    
+        return jsonify(success=True, message="Automate Start Task Set", data=output)
     except Exception as e:
         return str(e), 500	
         
@@ -164,12 +160,11 @@ def start_application():
 @app.route('/restart', methods=['GET'])
 def restart_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = result.communicate()
-        print(stdout)
-        print(stderr)
-        write_log(stdout, stderr)
-        return jsonify(success=True, data="Automate Restart Task Set", result=stdout, error=stderr)
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+        output = result.communicate()
+        print(output)
+        write_log(output)
+        return jsonify(success=True, message="Automate Restart Task Set", data=output)
     except Exception as e:
         return str(e), 500			
         
