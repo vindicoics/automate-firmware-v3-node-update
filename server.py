@@ -99,6 +99,7 @@ def stop_application():
         # stop_thread = threading.Thread(target=stop_automate)
         # stop_thread.start()
         result = subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        print(result.stdout)
 		# if result.returncode == 0:
         return jsonify(success=True, data="Automate Stop Task Set", result=result.stdout)
 		# else:
