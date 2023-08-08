@@ -69,9 +69,9 @@ def check_status():
 
 def update_automate():
     # Add a delay to allow the server to respond first
-    time.sleep(10)
+    time.sleep(5)
     # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=True, text=True)
+    subprocess.run(['sh', '/home/pi/automate-node/automate-update.sh'], capture_output=False)
 
 @app.route('/update', methods=['GET'])
 def update_application():
@@ -88,9 +88,9 @@ def update_application():
     
 def stop_automate():
     # Add a delay to allow the server to respond first
-    time.sleep(10)
+    time.sleep(5)
     # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=True, text=True)
+    subprocess.run(['sh', '/home/pi/automate-node/automate-stop.sh'], capture_output=False)
 
 @app.route('/stop', methods=['GET'])
 def stop_application():
@@ -107,9 +107,9 @@ def stop_application():
         
 def start_automate():
     # Add a delay to allow the server to respond first
-    time.sleep(10)
+    time.sleep(5)
     # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-start.sh'], capture_output=True, text=True)
+    subprocess.run(['sh', '/home/pi/automate-node/automate-start.sh'], capture_output=False)
 
 @app.route('/start', methods=['GET'])
 def start_application():
@@ -126,9 +126,9 @@ def start_application():
         
 def restart_automate():
     # Add a delay to allow the server to respond first
-    time.sleep(10)
+    time.sleep(5)
     # Execute the reboot command
-    subprocess.run(['sh', '/home/pi/automate-node/automate-restart.sh'], capture_output=True, text=True)
+    subprocess.run(['sh', '/home/pi/automate-node/automate-restart.sh'], capture_output=False)
 
 @app.route('/restart', methods=['GET'])
 def restart_application():
