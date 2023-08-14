@@ -198,7 +198,10 @@ def stop_application():
         service = request.args.get('service')
         if service is None:
             return jsonify(success=False, error="Missing 'service' parameter"), 400
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        path = request.args.get('path')
+        if path is None:
+            return jsonify(success=False, error="Missing 'path' parameter"), 400     
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', path + 'docker-compose.yaml', 'stop', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
@@ -211,7 +214,10 @@ def stop_application():
 @app.route('/start_automate', methods=['GET'])
 def start_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        path = request.args.get('path')
+        if path is None:
+            return jsonify(success=False, error="Missing 'path' parameter"), 400     
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', path + 'docker-compose.yaml', 'up', '-d', '--remove-orphans'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
@@ -226,8 +232,11 @@ def restart_application():
     try:
         service = request.args.get('service')
         if service is None:
-            return jsonify(success=False, error="Missing 'service' parameter"), 400        
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            return jsonify(success=False, error="Missing 'service' parameter"), 400   
+        path = request.args.get('path')
+        if path is None:
+            return jsonify(success=False, error="Missing 'path' parameter"), 400     
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', path + 'docker-compose.yaml', 'restart', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
