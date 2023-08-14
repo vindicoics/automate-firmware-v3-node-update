@@ -8,7 +8,7 @@ import time
 import threading
 import csv
 
-version = "1.0.2"
+version = "1.0.3"
 
 app = Flask(__name__)
 
