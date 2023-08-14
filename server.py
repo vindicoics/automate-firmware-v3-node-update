@@ -157,11 +157,11 @@ def update_server_application():
         return str(e), 500		
 
 ## UPDATE AUTOMATE SOFTWARE
-def update_automate(image,path):
+def update_automate(service,path):
     # Add a delay to allow the server to respond first
     time.sleep(5)
     # Pull the latest version of the application
-    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', image], cwd=path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', service], cwd=path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     stdout, stderr = result.communicate()
     output = stdout + '\n' + stderr
     print(output)
@@ -177,15 +177,15 @@ def update_automate(image,path):
 def update_application():
     try:
 		# Run the automate-update.sh script
-		# Extract the 'image' query parameter
-        image = request.args.get('image')
-        if image is None:
-            return jsonify(success=False, error="Missing 'image' parameter"), 400
+		# Extract the 'service' query parameter
+        service = request.args.get('service')
+        if service is None:
+            return jsonify(success=False, error="Missing 'service' parameter"), 400
         path = request.args.get('path')
         if path is None:
             return jsonify(success=False, error="Missing 'path' parameter"), 400
         
-        update_thread = threading.Thread(target=update_automate, args=(image,path))
+        update_thread = threading.Thread(target=update_automate, args=(service,path))
         update_thread.start()
         return jsonify(success=True, data="Automate Update Task Set")
     except Exception as e:
@@ -195,7 +195,10 @@ def update_application():
 @app.route('/stop_automate', methods=['GET'])
 def stop_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        service = request.args.get('service')
+        if service is None:
+            return jsonify(success=False, error="Missing 'service' parameter"), 400
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'stop', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
@@ -221,7 +224,10 @@ def start_application():
 @app.route('/restart_automate', methods=['GET'])
 def restart_application():
     try:
-        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        service = request.args.get('service')
+        if service is None:
+            return jsonify(success=False, error="Missing 'service' parameter"), 400        
+        result = subprocess.Popen(['sudo', 'docker-compose', '-f', '/home/pi/automate-node/docker-compose.yaml', 'restart', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = result.communicate()
         output = stdout + '\n' + stderr
         print(output)
