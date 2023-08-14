@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 import json
 import subprocess
 import psutil
@@ -157,11 +157,11 @@ def update_server_application():
         return str(e), 500		
 
 ## UPDATE AUTOMATE SOFTWARE
-def update_automate():
+def update_automate(image):
     # Add a delay to allow the server to respond first
     time.sleep(5)
     # Pull the latest version of the application
-    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', 'automate-node'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.Popen(['sudo', 'docker-compose', 'pull', image], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     stdout, stderr = result.communicate()
     output = stdout + '\n' + stderr
     print(output)
@@ -177,7 +177,12 @@ def update_automate():
 def update_application():
     try:
 		# Run the automate-update.sh script
-        update_thread = threading.Thread(target=update_automate)
+		# Extract the 'image' query parameter
+        image = request.args.get('image')
+        if image is None:
+            return jsonify(success=False, error="Missing 'image' parameter"), 400
+        
+        update_thread = threading.Thread(target=update_automate, args=(image,))
         update_thread.start()
         return jsonify(success=True, data="Automate Update Task Set")
     except Exception as e:
